@@ -294,15 +294,12 @@ div:has(> #bm-input-file-template),
 @keyframes blinkMissing {
     from { border-color: #ffea00; box-shadow: 0 0 8px 4px #ffea00; }
     to   { border-color: #fff700; box-shadow: 0 0 12px 6px #fff700; }
-}.switch-container {
-    margin: 10px 0;
 }
-.switch-container label {
+
+#bm-switch-missing-pixels label {
     cursor: pointer;
     font-weight: bold;
-    display: flex;
-    align-items: center;
 }
-.switch-container input[type="checkbox"] {
-    margin-right: 8px;
+#bm-switch-missing {
+    accent-color: #ffea00;
 }

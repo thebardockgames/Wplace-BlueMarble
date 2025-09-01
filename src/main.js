@@ -278,7 +278,7 @@ function buildOverlayMain() {
   overlayMain.addDiv({'id': 'bm-overlay', 'style': 'top: 10px; right: 75px;'})
     .addDiv({'id': 'bm-contain-header'})
       .addDiv({'id': 'bm-bar-drag'}).buildElement()
-      .addImg({'alt': 'Blue Marble Icon - Click to minimize/maximize', 'src': 'https://raw.githubusercontent.com/SwingTheVine/Wplace-BlueMarble/main/dist/assets/Favicon.png', 'style': 'cursor: pointer;'}, 
+      .addImg({'alt': 'Blue Marble Icon - Click to minimize/maximize', 'src': 'https://raw.githubusercontent.com/thebardockgames/Wplace-BlueMarble/refs/heads/main/dist/assets/Favicon.png', 'style': 'cursor: pointer;'}, 
         (instance, img) => {
           /** Click event handler for overlay minimize/maximize functionality.
            * 
@@ -632,6 +632,16 @@ function buildOverlayMain() {
               window.open('https://bluemarble.lol/', '_blank', 'noopener noreferrer');
             });
           }).buildElement()
+          // --- Switch para iluminar píxeles faltantes ---
+          .addDiv({'id': 'bm-switch-missing-pixels', 'style': 'margin: 10px 0; display: flex; align-items: center;'})
+            .addInput({'type': 'checkbox', 'id': 'bm-switch-missing', 'style': 'margin-right: 8px;'}, (instance, input) => {
+              input.addEventListener('change', (e) => {
+                window.dispatchEvent(new CustomEvent('toggleMissingPixels', { detail: e.target.checked }));
+              });
+            }).buildElement()
+            .addLabel({'htmlFor': 'bm-switch-missing', 'textContent': 'Iluminar píxeles faltantes'}).buildElement()
+          .buildElement()
+          // --- Fin del switch ---
         .buildElement()
         .addSmall({'textContent': 'Made by SwingTheVine', 'style': 'margin-top: auto;'}).buildElement()
       .buildElement()
