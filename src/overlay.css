@@ -276,3 +276,33 @@ div:has(> #bm-input-file-template),
 #bm-overlay button:disabled, #bm-overlay-telemetry button:disabled {
   text-decoration: line-through;
 }
+
+.switch-container {
+    margin: 10px 0;
+}
+.switch-container label {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.pixel.highlight-missing {
+    box-shadow: 0 0 8px 4px #ffea00, 0 0 2px 1px #fff;
+    border: 2px solid #ffea00;
+    animation: blinkMissing 0.7s infinite alternate;
+}
+
+@keyframes blinkMissing {
+    from { border-color: #ffea00; box-shadow: 0 0 8px 4px #ffea00; }
+    to   { border-color: #fff700; box-shadow: 0 0 12px 6px #fff700; }
+}.switch-container {
+    margin: 10px 0;
+}
+.switch-container label {
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+.switch-container input[type="checkbox"] {
+    margin-right: 8px;
+}

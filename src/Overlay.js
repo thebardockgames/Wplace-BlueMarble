@@ -697,3 +697,32 @@ export default class Overlay {
     this.updateInnerHTML(this.outputStatusId, 'Error: ' + text, true); // Update output Status box
   }
 }
+
+// Dentro del método que construye el overlay (por ejemplo, render() o constructor)
+const switchContainer = document.createElement('div');
+switchContainer.className = 'switch-container';
+
+const switchLabel = document.createElement('label');
+switchLabel.textContent = 'Iluminar píxeles faltantes';
+
+const switchInput = document.createElement('input');
+switchInput.type = 'checkbox';
+switchInput.id = 'missingPixelsSwitch';// ...existing code...
+
+
+// Busca el elemento overlay o créalo si no existe
+let overlayElement = document.getElementById('blue-marble-overlay');
+if (!overlayElement) {
+    overlayElement = document.createElement('div');
+    overlayElement.id = 'blue-marble-overlay';
+    document.body.appendChild(overlayElement);
+}
+
+switchLabel.appendChild(switchInput);
+switchContainer.appendChild(switchLabel);
+overlayElement.appendChild(switchContainer);
+
+switchInput.addEventListener('change', (e) => {
+    const isOn = e.target.checked;
+    window.dispatchEvent(new CustomEvent('toggleMissingPixels', { detail: isOn }));
+});

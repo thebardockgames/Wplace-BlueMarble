@@ -283,3 +283,29 @@ export default class Template {
     return { templateTiles, templateTilesBuffers };
   }
 }
+
+window.addEventListener('toggleMissingPixels', (e) => {
+    const illuminate = e.detail;
+    // Llama a la función que ilumina los píxeles faltantes
+    if (illuminate) {
+        highlightMissingPixels();
+    } else {
+        removeHighlightMissingPixels();
+    }
+});
+
+function highlightMissingPixels() {
+    // Supón que missingPixels es un array de objetos {x, y}
+    missingPixels.forEach(pixel => {
+        const pixelElem = document.querySelector(`.pixel[data-x="${pixel.x}"][data-y="${pixel.y}"]`);
+        if (pixelElem) {
+            pixelElem.classList.add('highlight-missing');
+        }
+    });
+}
+
+function removeHighlightMissingPixels() {
+    document.querySelectorAll('.pixel.highlight-missing').forEach(elem => {
+        elem.classList.remove('highlight-missing');
+    });
+}
