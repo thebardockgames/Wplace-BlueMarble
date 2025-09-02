@@ -488,6 +488,8 @@ function buildOverlayMain() {
 
     .addHr().buildElement()
 
+    
+
     .addDiv({'id': 'bm-contain-automation'})
       // .addCheckbox({'id': 'bm-input-stealth', 'textContent': 'Stealth', 'checked': true}).buildElement()
       // .addButtonHelp({'title': 'Waits for the website to make requests, instead of sending requests.'}).buildElement()
@@ -632,21 +634,13 @@ function buildOverlayMain() {
               window.open('https://bluemarble.lol/', '_blank', 'noopener noreferrer');
             });
           }).buildElement()
-          // --- Switch para iluminar píxeles faltantes ---
-          .addDiv({'id': 'bm-switch-missing-pixels', 'style': 'margin: 10px 0; display: flex; align-items: center;'})
-            .addInput({'type': 'checkbox', 'id': 'bm-switch-missing', 'style': 'margin-right: 8px;'}, (instance, input) => {
-              input.addEventListener('change', (e) => {
-                window.dispatchEvent(new CustomEvent('toggleMissingPixels', { detail: e.target.checked }));
-              });
-            }).buildElement()
-            .addLabel({'htmlFor': 'bm-switch-missing', 'textContent': 'Iluminar píxeles faltantes'}).buildElement()
-          .buildElement()
-          // --- Fin del switch ---
         .buildElement()
         .addSmall({'textContent': 'Made by SwingTheVine', 'style': 'margin-top: auto;'}).buildElement()
       .buildElement()
     .buildElement()
   .buildOverlay(document.body);
+
+
 
   // ------- Helper: Build the color filter list -------
   window.buildColorFilterList = function buildColorFilterList() {
@@ -704,6 +698,8 @@ function buildOverlayMain() {
       toggle.addEventListener('change', () => {
         meta.enabled = toggle.checked;
         overlayMain.handleDisplayStatus(`${toggle.checked ? 'Enabled' : 'Disabled'} ${rgb}`);
+        consoleLog(`${name}: ${toggle.checked ? 'Enabled' : 'Disabled'} ${rgb}`);
+        // Update storage
         try {
           const t = templateManager.templatesArray?.[0];
           const key = t?.storageKey;

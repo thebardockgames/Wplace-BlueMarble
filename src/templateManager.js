@@ -427,55 +427,95 @@ export default class TemplateManager {
         } else {
           // ELSE we need to apply the color filter
 
-          console.log('Applying color filter...');
+console.log('Applying color filter...');
 
-          const tempW = template.bitmap.width;
-          const tempH = template.bitmap.height;
+const tempW = template.bitmap.width;
+const tempH = template.bitmap.height;
 
-          const filterCanvas = new OffscreenCanvas(tempW, tempH);
-          const filterCtx = filterCanvas.getContext('2d', { willReadFrequently: true });
-          filterCtx.imageSmoothingEnabled = false; // Nearest neighbor
-          filterCtx.clearRect(0, 0, tempW, tempH);
-          filterCtx.drawImage(template.bitmap, 0, 0);
+const filterCanvas = new OffscreenCanvas(tempW, tempH);
+const filterCtx = filterCanvas.getContext('2d', { willReadFrequently: true });
+filterCtx.imageSmoothingEnabled = false; // Nearest neighbor
+filterCtx.clearRect(0, 0, tempW, tempH);
+filterCtx.drawImage(template.bitmap, 0, 0);
 
-          const img = filterCtx.getImageData(0, 0, tempW, tempH);
-          const data = img.data;
+const img = filterCtx.getImageData(0, 0, tempW, tempH);
+const data = img.data;
 
-          // For every pixel...
-          for (let y = 0; y < tempH; y++) {
-            for (let x = 0; x < tempW; x++) {
+const shreadSize = this.drawMult || 3; // debe coincidir con Template.js (3)
+const visibleCenters = []; // <-- NUEVO: guardaremos los centros que queden visibles
 
-              // If this pixel is NOT the center pixel, then skip the pixel
-              if ((x % this.drawMult) !== 1 || (y % this.drawMult) !== 1) { continue; }
+// === PASADA 1: filtra por paleta y anota los centros visibles ===
+for (let y = 0; y < tempH; y++) {
+  for (let x = 0; x < tempW; x++) {
 
-              const idx = (y * tempW + x) * 4;
-              const r = data[idx];
-              const g = data[idx + 1];
-              const b = data[idx + 2];
-              const a = data[idx + 3];
+    // Sólo centros de la celda 3x3
+    if ((x % shreadSize) !== 1 || (y % shreadSize) !== 1) {
+      // No centro: no tocamos (ya vienen alpha 0 desde Template.js)
+      continue;
+    }
 
-              if (a < 1) { continue; }
+    const idx = (y * tempW + x) * 4;
+    const r = data[idx];
+    const g = data[idx + 1];
+    const b = data[idx + 2];
+    const a = data[idx + 3];
+    if (a < 1) continue; // centro transparente, nada que hacer
 
-              let key = activeTemplate.allowedColorsSet.has(`${r},${g},${b}`) ? `${r},${g},${b}` : 'other';
+    // Mapea a clave de paleta o 'other'
+    let key = activeTemplate.allowedColorsSet.has(`${r},${g},${b}`) ? `${r},${g},${b}` : 'other';
 
-              // Hide if color is not in allowed palette or explicitly disabled
-              const inWplacePalette = activeTemplate?.allowedColorsSet ? activeTemplate.allowedColorsSet.has(key) : true;
+    // ¿Está permitido y habilitado?
+    const inWplacePalette = activeTemplate?.allowedColorsSet ? activeTemplate.allowedColorsSet.has(key) : true;
+    const isPaletteColorEnabled = palette?.[key]?.enabled !== false;
 
-              // if (inWplacePalette) {
-              //   key = 'other'; // Map all non-palette colors to "other"
-              //   console.log('Added color to other');
-              // }
+    if (!inWplacePalette || !isPaletteColorEnabled) {
+      data[idx + 3] = 0; // ocultar centro deshabilitado
+    } else {
+      // Centro habilitado -> lo marcamos para el halo
+      visibleCenters.push([x, y]);
+    }
+  }
+}
 
-              const isPaletteColorEnabled = palette?.[key]?.enabled !== false;
-              if (!inWplacePalette || !isPaletteColorEnabled) {
-                data[idx + 3] = 0; // hide disabled color center pixel
-              }
-            }
-          }
+// === PASADA 2: halo fucsia alrededor de los centros habilitados ===
+const OUTLINE_R = 255, OUTLINE_G = 0, OUTLINE_B = 255; // fucsia
+const OUTLINE_A = 220; // opacidad del halo (0–255)
+const radius = 1; // corona 3x3 (sin centro)
 
-          // Draws the template with somes colors disabled
-          filterCtx.putImageData(img, 0, 0);
-          context.drawImage(filterCanvas, Number(template.pixelCoords[0]) * this.drawMult, Number(template.pixelCoords[1]) * this.drawMult);
+const ringOffsets = [];
+for (let dy = -radius; dy <= radius; dy++) {
+  for (let dx = -radius; dx <= radius; dx++) {
+    if (dx === 0 && dy === 0) continue; // saltar el centro
+    ringOffsets.push([dx, dy]);
+  }
+}
+
+for (const [cx, cy] of visibleCenters) {
+  for (const [dx, dy] of ringOffsets) {
+    const nx = cx + dx;
+    const ny = cy + dy;
+    if (nx < 0 || ny < 0 || nx >= tempW || ny >= tempH) continue;
+
+    const nIdx = (ny * tempW + nx) * 4;
+
+    // Sólo pintamos halo si el píxel está transparente (no pisar centros ni checker)
+    if (data[nIdx + 3] === 0) {
+      data[nIdx]     = OUTLINE_R;
+      data[nIdx + 1] = OUTLINE_G;
+      data[nIdx + 2] = OUTLINE_B;
+      data[nIdx + 3] = OUTLINE_A;
+    }
+  }
+}
+
+// Dibujar resultado filtrado + halo
+filterCtx.putImageData(img, 0, 0);
+context.drawImage(
+  filterCanvas,
+  Number(template.pixelCoords[0]) * this.drawMult,
+  Number(template.pixelCoords[1]) * this.drawMult
+);
+
         }
       } catch (exception) {
 

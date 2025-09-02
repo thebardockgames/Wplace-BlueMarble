@@ -296,10 +296,3 @@ div:has(> #bm-input-file-template),
     to   { border-color: #fff700; box-shadow: 0 0 12px 6px #fff700; }
 }
 
-#bm-switch-missing-pixels label {
-    cursor: pointer;
-    font-weight: bold;
-}
-#bm-switch-missing {
-    accent-color: #ffea00;
-}
